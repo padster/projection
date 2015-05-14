@@ -1,0 +1,23 @@
+Upcoming plans:
+
+1) Add observable listeners to all impl models.
+  * notifier
+  * listener delta types?
+  * disposable / cleanup type.
+  * tests
+
+2) Static templating
+  * template loader
+  * (root: Type, p: path) -> result: Type
+  * Type -> template
+
+3) Better path handling?
+  * elvis operators
+  * path-based change notifiers?
+
+4) Basic server working, serving static template results.
+
+5) GWT support for compiling to JS.
+
+6) Proto-like type path -> model StringMap
+
