@@ -1,4 +1,8 @@
 # Underlying data model used throughout Project Icon
+package(
+  default_visibility = ["//visibility:public"],
+)
+
 
 TEST_SRCS = glob(["test/**/*.java"])
 
