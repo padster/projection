@@ -4,11 +4,9 @@ package(
 )
 
 
-TEST_SRCS = glob(["test/**/*.java"])
-
 java_library(
   name = "spec",
-  srcs = glob(["**/*.java"], exclude = TEST_SRCS),
+  srcs = glob(["**/*.java"], exclude = ["SpecGenerator.java"]),
   deps = [
     "//com/padsterprogramming/projection/model:model",
     "//com/padsterprogramming/projection:jackson",
@@ -17,12 +15,16 @@ java_library(
 
 # HACK - Run this to execute Junit4 tests until bazel test works.
 java_binary(
-  name = "tests_hack",
-  main_class = "com.padsterprogramming.projection.spec.HackRunner",
-  srcs = ["HackRunner.java"],
+  name = "gen",
+  main_class = "com.padsterprogramming.projection.spec.SpecGenerator",
+  srcs = ["SpecGenerator.java"],
   deps = [
     ":spec",
     "//com/padsterprogramming/projection/model:model",
+    "//com/padsterprogramming/projection/tpl:text",
   ],
-  resources = ["testmodel.spec"],
+  resources = [
+    "basetype.tpl.txt",
+    "model.spec",
+  ],
 )

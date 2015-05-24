@@ -7,6 +7,7 @@ import com.padsterprogramming.projection.model.observable.Listener;
 import com.padsterprogramming.projection.model.observable.ObservableList;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 /** List which can do everything. */
 public class ListImpl<T extends Type> implements ObservableList<T>, ModifiableList<T> {
@@ -39,6 +40,10 @@ public class ListImpl<T extends Type> implements ObservableList<T>, ModifiableLi
   @Override public void remove(int index) {
     values.remove(index);
     // TODO - listeners.
+  }
+
+  @Override public void forEach(Consumer<? super T> action) {
+    values.forEach(action);
   }
 
   @Override public void addListener(Listener<List<T>> listener) {

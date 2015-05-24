@@ -1,0 +1,36 @@
+/** Generated from {{file}} - do not edit! **/
+
+package {{package}};
+
+import com.padsterprogramming.projection.model.*;
+import com.padsterprogramming.projection.model.impl.*;
+import com.padsterprogramming.projection.model.util.Primitives;
+
+// HACK, TODO: replace UpperXXX with global function!
+
+public class {{UpperName}} extends StringMapImpl<com.padsterprogramming.projection.model.Type> {
+  // Constructor with defaults
+  public {{UpperName}}() {
+    this({{#field}}
+      {{defaultValue}},{{/field}}
+      null /* Void ignore */);
+  }
+
+  // Constructor with everything provided.
+  public {{UpperName}}({{#field}}
+      {{UpperType}} {{name}},{{/field}}
+      Void ignore) {
+{{#field}}    this.set("{{name}}", {{TypeWrapperConstructor}});
+{{/field}}  }
+
+  // TODO - builder? or just modifiable version.
+{{#field}}
+  // "{{name}}": "{{type}}"
+  public {{UpperType}} {{name}}() {
+    return this.observable{{UpperName}}().get();
+  }
+  public {{TypeWrapper}} observable{{UpperName}}() {
+    return ({{TypeWrapper}}) this.get("{{name}}");
+  }
+{{/field}}
+}

@@ -20,6 +20,8 @@ import java.io.InputStream;
 
 /** Reads a model spec from file. */
 public class SpecReader {
+  // TODO - make this more specific, and pull out JSON -> StringMap parser into separate utility.
+
   /** Parse a JSON object from a stream into a stringmap. Generic only, use generated versions for type-safety. */
   public StringMap<Type> parseStringMap(InputStream input) throws IOException {
     // PICK: Support primitives/lists too?

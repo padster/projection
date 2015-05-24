@@ -9,6 +9,7 @@ import com.padsterprogramming.projection.model.observable.ObservableStringMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 /** StringMap which can do everything. */
 public class StringMapImpl<T extends Type> implements ObservableStringMap<T>, ModifiableStringMap<T> {
@@ -27,6 +28,10 @@ public class StringMapImpl<T extends Type> implements ObservableStringMap<T>, Mo
   @Override public T get(String key) {
     // PICK: index-out-of-bounds here, and only allow null result on getOrDefault?
     return values.get(key);
+  }
+
+  @Override public void forEach(BiConsumer<String, ? super T> action) {
+    values.forEach(action);
   }
 
   @Override public void set(String key, T value) {
