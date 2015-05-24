@@ -17,7 +17,7 @@ Upcoming plans:
 
 4) Basic server working, serving static template results.
 
-5) GWT support for compiling to JS.
+5) GWT support for compiling to JS in build files.
 
 6) Proto-like type path -> model StringMap
 

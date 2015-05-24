@@ -7,6 +7,8 @@ import com.padsterprogramming.projection.model.observable.Listener;
 import com.padsterprogramming.projection.model.observable.ObservableStringMap;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 /** StringMap which can do everything. */
 public class StringMapImpl<T extends Type> implements ObservableStringMap<T>, ModifiableStringMap<T> {
@@ -42,5 +44,15 @@ public class StringMapImpl<T extends Type> implements ObservableStringMap<T>, Mo
 
   @Override public void removeListener(Listener<StringMap<T>> listener) {
     // TODO - listeners.
+  }
+
+  public Set<String> keys() {
+    return values.keySet();
+  }
+
+  @Override public String toString() {
+    StringBuilder builder = new StringBuilder().append('{');
+    values.forEach((k, v) -> builder.append(k + ":" + v + ","));
+    return builder.append('}').toString();
   }
 }

@@ -48,4 +48,10 @@ public class ListImpl<T extends Type> implements ObservableList<T>, ModifiableLi
   @Override public void removeListener(Listener<List<T>> listener) {
     // TODO - listeners.
   }
+
+  @Override public String toString() {
+    StringBuilder builder = new StringBuilder().append('[');
+    values.forEach(v -> builder.append(v + ","));
+    return builder.append(']').toString();
+  }
 }

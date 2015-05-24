@@ -33,4 +33,10 @@ public class PrimitiveImpl<T> implements ObservablePrimitive<T>, ModifiablePrimi
   @Override public void removeListener(Listener<T> listener) {
     // TODO - listeners.
   }
+
+  @Override public String toString() {
+    StringBuilder builder = new StringBuilder().append('(');
+    builder.append(value);
+    return builder.append(')').toString();
+  }
 }
