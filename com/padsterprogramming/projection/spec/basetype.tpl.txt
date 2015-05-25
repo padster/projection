@@ -8,29 +8,37 @@ import com.padsterprogramming.projection.model.util.Primitives;
 
 // HACK, TODO: replace UpperXXX with global function!
 
-public class {{UpperName}} extends StringMapImpl<com.padsterprogramming.projection.model.Type> {
-  // Constructor with defaults
-  public {{UpperName}}() {
-    this({{#field}}
-      {{defaultValue}},{{/field}}
-      null /* Void ignore */);
-  }
+/** Put all outputs within one outer class. */
+public final class {{WrapperClass}} {
+  private {{WrapperClass}}() {} // Don't create one of these.
 
-  // Constructor with everything provided.
-  public {{UpperName}}({{#field}}
-      {{UpperType}} {{name}},{{/field}}
-      Void ignore) {
-{{#field}}    this.set("{{name}}", {{TypeWrapperConstructor}});
-{{/field}}  }
+  // TODO: iterate over each type in the spec.
+  // PICK: generate into separate files if possible.
 
-  // TODO - builder? or just modifiable version.
-{{#field}}
-  // "{{name}}": "{{type}}"
-  public {{UpperType}} {{name}}() {
-    return this.observable{{UpperName}}().get();
+  public static class {{UpperName}} extends StringMapImpl<com.padsterprogramming.projection.model.Type> {
+    // Constructor with defaults
+    public {{UpperName}}() {
+      this({{#field}}
+        {{defaultValue}},{{/field}}
+        null /* Void ignore */);
+    }
+
+    // Constructor with everything provided.
+    public {{UpperName}}({{#field}}
+        {{UpperType}} {{name}},{{/field}}
+        Void ignore) {
+  {{#field}}    this.set("{{name}}", {{TypeWrapperConstructor}});
+  {{/field}}  }
+
+    // TODO - builder? or just modifiable version.
+  {{#field}}
+    // "{{name}}": "{{type}}"
+    public {{UpperType}} {{name}}() {
+      return this.observable{{UpperName}}().get();
+    }
+    public {{TypeWrapper}} observable{{UpperName}}() {
+      return ({{TypeWrapper}}) this.get("{{name}}");
+    }
+  {{/field}}
   }
-  public {{TypeWrapper}} observable{{UpperName}}() {
-    return ({{TypeWrapper}}) this.get("{{name}}");
-  }
-{{/field}}
 }
