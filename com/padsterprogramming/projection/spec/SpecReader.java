@@ -1,5 +1,6 @@
 package com.padsterprogramming.projection.spec;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -26,6 +27,7 @@ public class SpecReader {
   public StringMap<Type> parseStringMap(InputStream input) throws IOException {
     // PICK: Support primitives/lists too?
     ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
     ObjectNode asNode = mapper.readValue(input, ObjectNode.class);
     return convertObject(asNode);
   }

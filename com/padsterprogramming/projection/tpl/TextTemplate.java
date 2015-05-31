@@ -50,9 +50,13 @@ public class TextTemplate {
 
     @Override public void write(StringBuilder builder, StringMap<Type> context) {
       List<? extends Type> values = (List<? extends Type>) contextLookup(context, path);
-      values.forEach(child -> {
-        childNode.write(builder, buildContext(child, context));
-      });
+      if (values != null && !values.isEmpty()) {
+        values.forEach(child -> {
+          childNode.write(builder, buildContext(child, context));
+        });
+      } else {
+        // TODO - add template options for empty lists.
+      }
     }
   }
 

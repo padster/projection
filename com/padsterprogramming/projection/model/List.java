@@ -18,4 +18,9 @@ public interface List<T extends Type> extends Type {
     T result = get(index);
     return result != null ? result : defaultValue;
   }
+
+  /** @return Whether the list is empty. */
+  default boolean isEmpty() {
+    return size() == 0;
+  }
 }

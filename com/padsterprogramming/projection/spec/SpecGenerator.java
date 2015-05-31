@@ -19,15 +19,13 @@ public class SpecGenerator {
     String specPath = args[0];
     String[] outputPackageAndClass = parseFileName(args[1]);
 
-    StringMap<com.padsterprogramming.projection.model.Type>
-        specData = new SpecReader().parseStringMap(new FileInputStream(args[0]));
+    StringMap<Type> specData = new SpecReader().parseStringMap(new FileInputStream(args[0]));
 
     String templatePath = "com/padsterprogramming/projection/spec/basetype.tpl.txt";
     TextTemplate.ContextNode template = TextTemplateParser.parse(resourceToStream(templatePath));
 
     // HACK - need to do this via bound template method instead.
-    StringMap<com.padsterprogramming.projection.model.Type> processed =
-        processData(specData, specPath, outputPackageAndClass[0], outputPackageAndClass[1]);
+    StringMap<Type> processed = processData(specData, specPath, outputPackageAndClass[0], outputPackageAndClass[1]);
     String result = TextTemplateWriter.write(template, processed);
     System.out.println(result);
   }
@@ -51,43 +49,126 @@ public class SpecGenerator {
     };
   }
 
-  // HACK - automate via template, see above.
-  private static StringMap<com.padsterprogramming.projection.model.Type> processData(
-      StringMap<com.padsterprogramming.projection.model.Type> data, String filePath, String package_, String class_) {
-    StringMapImpl<com.padsterprogramming.projection.model.Type> result = new StringMapImpl<>();
+  // TODO - replace with once-off mapping template.
+  private static StringMap<Type> processData(
+      StringMap<Type> data, String filePath, String package_, String class_) {
+    StringMapImpl<Type> result = new StringMapImpl<>();
+
     result.set("file", Primitives.of(filePath));
     result.set("WrapperClass", Primitives.of(class_));
 
-    ((StringMapImpl<com.padsterprogramming.projection.model.Type>) data).keys().forEach(name -> {
+    ListImpl<StringMap<Type>> typeList = new ListImpl<>();
+
+    data.forEach((name, typeInput) -> {
       if (name.equals("package")) {
-        Primitive<String> packageValue = (Primitive<String>) data.get("package");
+        Primitive<String> packageValue = (Primitive<String>) typeInput;
         // TODO - verify the package in the file is the same as package_ from the output.
         result.set(name, packageValue);
       } else {
-        result.set("name", Primitives.of(name));
-        result.set("UpperName", Primitives.of(upperFirst(name)));
-
-        StringMap<Type> typeData = (StringMap<Type>) data.get(name);
-        List<Type> typeFieldList = (List<Type>) typeData.get("field");
-        StringMap<Type> fieldsForType = (StringMap<Type>) typeFieldList.get(0);
+        StringMapImpl<Type> typeOutput = new StringMapImpl<>();
+        typeOutput.set("name", Primitives.of(name));
+        typeOutput.set("UpperName", Primitives.of(upperFirst(name)));
 
         ListImpl<Type> processedFields = new ListImpl<>();
-        fieldsForType.forEach((fieldName, value) -> {
-          String v = ((Primitive<String>) value).get();
-          String ufv = upperFirst(v);
-          StringMapImpl<Type> fieldType = new StringMapImpl<>();
-          fieldType.set("name", Primitives.of(fieldName));
-          fieldType.set("UpperName", Primitives.of(upperFirst(fieldName)));
-          fieldType.set("type", Primitives.of(v));
-          fieldType.set("UpperType", Primitives.of(upperFirst(v)));
-          fieldType.set("TypeWrapper", Primitives.of(String.format("Primitive<%s>", ufv)));
-          fieldType.set("TypeWrapperConstructor", Primitives.of(String.format("mew Primitive<%s>(%s)", ufv, name)));
-          processedFields.append(fieldType);
+
+        StringMap<Type> specType = (StringMap<Type>) typeInput;
+        specType.forEach((fieldName, fieldType) -> {
+          String typeString = ((Primitive<String>) fieldType).get();
+
+          StringMapImpl<Type> info = new StringMapImpl<>();
+          info.set("name", Primitives.of(fieldName));
+          info.set("UpperName", Primitives.of(upperFirst(fieldName)));
+          info.set("type", Primitives.of(typeString));
+          info.set("ObservableType", Primitives.of(typeStringToObservableType(typeString)));
+          info.set("UnobservableType", Primitives.of(typeStringToUnobservableType(typeString)));
+          info.set("TypeWrapperConstructor", Primitives.of(unobservableToObservableTypeWrapper(typeString, fieldName)));
+          info.set("defaultValue", Primitives.of(defaultValue(typeString)));
+          processedFields.append(info);
         });
-        result.set("field", processedFields);
+
+        typeOutput.set("fields", processedFields);
+        typeList.append(typeOutput);
       }
     });
+
+    result.set("types", typeList);
     return result;
+  }
+
+  private static final String typeStringToObservableType(String typeString) {
+    if (typeString.startsWith("StringMap<")) {
+      if (!typeString.endsWith(">")) {
+        throw new IllegalArgumentException("Unsupported type: " + typeString);
+      }
+      return typeString;
+    }
+
+    // TODO - handle List<> like StringMap above, when needed.
+
+    switch (typeString) {
+      case "double":
+      case "boolean":
+      case "long":
+      case "string":
+        return "Primitive<" + upperFirst(typeString) + ">";
+    }
+    // PICK - support checking if the class is a proto, and having a Primitive<Message> for that too?
+
+    return typeString;
+  }
+
+  private static final String typeStringToUnobservableType(String typeString) {
+    if (typeString.startsWith("StringMap<")) {
+      if (!typeString.endsWith(">")) {
+        throw new IllegalArgumentException("Unsupported type: " + typeString);
+      }
+      return typeString;
+    }
+
+    // TODO - handle List<> like StringMap above, when needed.
+
+    switch (typeString) {
+      case "double":
+      case "boolean":
+      case "long":
+      case "string":
+        return upperFirst(typeString);
+    }
+
+    return typeString;
+  }
+
+  private static final String unobservableToObservableTypeWrapper(String typeString, String variableName) {
+    if (typeString.startsWith("StringMap<")) {
+      if (!typeString.endsWith(">")) {
+        throw new IllegalArgumentException("Unsupported type: " + typeString);
+      }
+      return variableName;
+    }
+
+    switch (typeString) {
+      case "double":
+      case "boolean":
+      case "long":
+      case "string":
+        return "Primitives.of(" + variableName + ")";
+    }
+
+    return variableName;
+  }
+
+  private static final String defaultValue(String typeString) {
+    switch (typeString) {
+      case "double":
+        return "0.0";
+      case "boolean":
+        return "false";
+      case "long":
+        return "0";
+    }
+    // PICK - use null and boxed types for everything?
+    // PICK - default String to empty string? Lists/Map to empty?
+    return "null";
   }
 
   private static String upperFirst(String input) {

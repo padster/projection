@@ -1,12 +1,13 @@
 {
-  "package": "com.padsterprogramming.projection.specz",
+  "package": "com.padsterprogramming.projection.spec",
 
   "Type": {
     "name": "string",
-    "field": [{
-      "name": "string",
-      "type": "string",
-      "repeated": "boolean"
-    }]
+    "fields": "List<Field>"
+  },
+
+  "Field": {
+    "name": "string",
+    "type": "string",
   }
 }
