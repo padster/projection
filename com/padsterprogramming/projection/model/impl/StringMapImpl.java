@@ -7,7 +7,6 @@ import com.padsterprogramming.projection.model.observable.Listener;
 import com.padsterprogramming.projection.model.observable.ObservableStringMap;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.function.BiConsumer;
 

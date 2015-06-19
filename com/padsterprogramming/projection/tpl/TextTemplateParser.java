@@ -45,8 +45,10 @@ public class TextTemplateParser {
   }
 
   private TextTemplate.Node parseCommand(String command) {
-    if (command.charAt(0) == '#') {
-      return parseForLoop(command.substring(1));
+    if (command.startsWith("#if ")) {
+      return parseIfStatement(command.substring("#if ".length()));
+    } else if (command.charAt(0) == '#') {
+      return parseForLoop(command.substring("#".length()));
     } else {
       // Assume it's a lookup
       return new TextTemplate.LookupNode(command);
@@ -56,5 +58,10 @@ public class TextTemplateParser {
   private TextTemplate.Node parseForLoop(String fieldName) {
     TextTemplate.ContextNode child = parseNode("/" + fieldName);
     return new TextTemplate.LoopNode(fieldName, child);
+  }
+
+  private TextTemplate.Node parseIfStatement(String fieldName) {
+    TextTemplate.ContextNode child = parseNode("/if");
+    return new TextTemplate.IfNode(fieldName, child);
   }
 }

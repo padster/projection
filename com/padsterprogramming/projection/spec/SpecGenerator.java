@@ -30,8 +30,13 @@ public class SpecGenerator {
     System.out.println(result);
   }
 
+  // TODO - common util;
   private static InputStream resourceToStream(String path) {
-    return SpecGenerator.class.getClassLoader().getResourceAsStream(path);
+    InputStream stream = SpecGenerator.class.getClassLoader().getResourceAsStream(path);
+    if (stream == null) {
+      throw new IllegalArgumentException("File not found: " + path);
+    }
+    return stream;
   }
 
   /** @return [package, class name] parsed from the file location. */
@@ -83,6 +88,8 @@ public class SpecGenerator {
           info.set("UnobservableType", Primitives.of(typeStringToUnobservableType(typeString)));
           info.set("TypeWrapperConstructor", Primitives.of(unobservableToObservableTypeWrapper(typeString, fieldName)));
           info.set("defaultValue", Primitives.of(defaultValue(typeString)));
+          info.set("UnobservableIsNotObservable", Primitives.of(
+              !typeStringToObservableType(typeString).equals(typeStringToUnobservableType(typeString))));
           processedFields.append(info);
         });
 
@@ -131,6 +138,7 @@ public class SpecGenerator {
       case "double":
       case "boolean":
       case "long":
+        return typeString;
       case "string":
         return upperFirst(typeString);
     }

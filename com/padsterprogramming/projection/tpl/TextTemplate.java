@@ -77,6 +77,35 @@ public class TextTemplate {
     }
   }
 
+  /** Flips on a lookup. */
+  public static class IfNode implements Node {
+    private final String path;
+    private final Node trueNode;
+    // TODO - false node.
+
+    public IfNode(String path, Node trueNode) {
+      if (path.indexOf(".") != -1) {
+        // TODO - support this.
+        throw new IllegalArgumentException("Sub-path lookup (" + path + ") not supported yet :(");
+      }
+      this.path = path;
+      this.trueNode = trueNode;
+    }
+
+    @Override public void write(StringBuilder builder, StringMap<Type> context) {
+      // TODO - more complex if statements.
+      Object field = contextLookup(context, path);
+      if (field != null && !(field instanceof Boolean)) {
+        throw new IllegalArgumentException("If statement for path " + path + " must be boolean, not " + field.getClass().getName());
+      }
+      if (field != null && ((Boolean)field).booleanValue()) {
+        trueNode.write(builder, context);
+      } else {
+        // TODO - else statement.
+      }
+    }
+  }
+
   // Utilities
   static StringMapImpl<Type> buildContext(Type child, StringMap<Type> parent) {
     StringMapImpl<Type> result = new StringMapImpl<>();

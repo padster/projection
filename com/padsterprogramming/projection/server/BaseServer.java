@@ -1,5 +1,7 @@
 package com.padsterprogramming.projection.server;
 
+import com.padsterprogramming.projection.model.StringMap;
+import com.padsterprogramming.projection.model.Type;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -10,33 +12,63 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 /** Root HTTP handler. */
-public class BaseServer implements HttpHandler {
+public abstract class BaseServer implements HttpHandler {
   private final Charset CHARSET = Charset.forName("ISO-8859-1"); // Default web charset.
+
+  private final Map<String, StringMap<?>> storeHandlers = new HashMap<>();
 
   // TODO - Flags -> StringMap parser.
 
   // TODO - Guicify.
-  public static void main(String[] args) throws IOException {
-    BaseServer baseHandler = new BaseServer();
+  public static <T extends BaseServer> void run(T baseServer, String[] args) throws IOException {
+    baseServer.configureHandlers();
     HttpServer server = HttpServer.create(new InetSocketAddress(8888), 0);
-    server.createContext("/", baseHandler);
+    server.createContext("/", baseServer);
     server.setExecutor(null); // Same-thread executor.
     server.start();
   }
 
+  // Override this to add custom handling
+  public abstract void configureHandlers();
+
+  // Register handlers for a given URL
+  // TODO: implement, with pattern matching for arg extraction
+
+  // Register storage handlers with a given base.
+  public void handleStore(String path, StringMap<?> store) {
+    storeHandlers.put(path, store);
+  }
+
+
   @Override public void handle(HttpExchange httpExchange) throws IOException {
-    System.out.println("URI = " + httpExchange.getRequestURI());
+    System.out.println("URI = " + httpExchange.getRequestURI().getPath());
     System.out.println("Method = " + httpExchange.getRequestMethod());
 
+    String fullPath = httpExchange.getRequestURI().getPath();
+    String method = httpExchange.getRequestMethod();
+
+    Type[] response = {null};
+    storeHandlers.forEach((path, store) -> {
+      if (fullPath.startsWith(path)) {
+        String remainder = fullPath.substring(path.length());
+        if (remainder.startsWith("/")) { // HACK - should be a cleaner way,,,Or not needed at all.
+          remainder = remainder.substring(1);
+        }
+        System.out.println("Handing store for " + remainder);
+        response[0] = store.get(remainder);
+      }
+    });
+
     Headers headers = httpExchange.getResponseHeaders();
-    headers.set("Content-Type", "text/html"); // application/json for Json, application/javascript for JsonP
+    headers.set("Content-Type", "text/plain"); // text/html for html, application/json for Json, application/javascript for JsonP
 
     OutputStream result = httpExchange.getResponseBody();
-    String message = loadFile("com/padsterprogramming/projection/server/resources/template.jsont");
+    String message = response[0].toString();
 
-//    String message = "<html><head><title>Hi!</title></head><body><div>" + httpExchange.getRequestURI() + "</div></body></html>";
     httpExchange.sendResponseHeaders(200, message.length());
     result.write(message.getBytes(CHARSET)); // HACK - use fixed charset.
     result.close();

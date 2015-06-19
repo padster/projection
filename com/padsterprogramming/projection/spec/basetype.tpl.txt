@@ -22,6 +22,10 @@ public final class {{WrapperClass}} {
         null /* Void ignore */);
     }
 
+    public {{UpperName}} get() {
+      return this;
+    }
+
     // Constructor with everything provided.
     public {{UpperName}}({{#fields}}
         {{UnobservableType}} {{name}},{{/fields}}
@@ -31,7 +35,7 @@ public final class {{WrapperClass}} {
   {{#fields}}
     // "{{name}}": "{{type}}"
     public {{UnobservableType}} {{name}}() {
-      return this.observable{{UpperName}}().get();
+      return this.observable{{UpperName}}(){{#if UnobservableIsNotObservable}}.get(){{/if}};
     }
     public {{ObservableType}} observable{{UpperName}}() {
       return ({{ObservableType}}) this.get("{{name}}");

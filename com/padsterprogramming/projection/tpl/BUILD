@@ -16,3 +16,16 @@ java_library(
     "//com/padsterprogramming/projection/model:model",
   ],
 )
+
+# TODO - get bazel test working :'(
+# bazel run com/padsterprogramming/projection/tpl:test
+java_binary(
+  name = "test",
+  main_class = "com.padsterprogramming.projection.tpl.Test",
+  srcs = ["Test.java"],
+  deps = [
+    ":text",
+    "//com/padsterprogramming/projection/model:model",
+  ],
+  resources = ["test.tpl.txt"],
+)

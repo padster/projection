@@ -1,0 +1,44 @@
+/** Generated from {{file}} - do not edit! **/
+
+package {{package}};
+
+import com.padsterprogramming.projection.model.*;
+import com.padsterprogramming.projection.model.impl.*;
+import com.padsterprogramming.projection.model.observable.*;
+
+import java.util.Set;
+import java.util.function.BiConsumer;
+
+/** Put all outputs within one outer class. */
+public final class {{JavaClass}}Store extends StringMapImpl<{{FullJavaClass}}> {
+
+  @Override public int size() {
+    // TODO - support size index for store.
+    throw new UnsupportedOperationException("Store doesn't have size yet :(");
+  }
+
+  @Override public void forEach(BiConsumer<String, ? super {{FullJavaClass}}> action) {
+    // TODO - support offline foreach on stores.
+    throw new UnsupportedOperationException("Store doesn't support forEach :(");
+  }
+
+  @Override public void addListener(Listener<StringMap<{{FullJavaClass}}>> listener) {
+    // TODO - listeners.
+    throw new UnsupportedOperationException("Can't listen to stores (yet)");
+  }
+
+  @Override public void removeListener(Listener<StringMap<{{FullJavaClass}}>> listener) {
+    // TODO - listeners.
+    throw new UnsupportedOperationException("Can't listen to stores (yet)");
+  }
+
+  public Set<String> keys() {
+    // TODO - offline foreach.
+    throw new UnsupportedOperationException("Can't iterate through stores");
+  }
+
+  @Override public String toString() {
+    return "In-memory store for {{JavaClass}}";
+  }
+
+}

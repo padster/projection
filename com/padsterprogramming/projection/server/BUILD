@@ -1,15 +1,27 @@
 # Run a server for a Project Ion App
 
+package(
+  default_visibility = ["//visibility:public"],
+)
+
 RESOURCE_FILES = glob(["resources/**/*"])
+
+java_library(
+  name = "server",
+  srcs = ["BaseServer.java"],
+  deps = [
+    "//com/padsterprogramming/projection/model:model",
+  ]
+)
 
 
 # bazel run com/padsterprogramming/projection/model:tests_hack
-java_binary(
-  name = "server",
-  main_class = "com.padsterprogramming.projection.server.BaseServer",
-  srcs = ["BaseServer.java"],
-  resources = RESOURCE_FILES
-)
+#java_binary(
+#  name = "server",
+#  main_class = "com.padsterprogramming.projection.server.BaseServer",
+#  srcs = ["BaseServer.java"],
+#  resources = RESOURCE_FILES
+#)
 
 
 # Mostly working. From com/padsterprogramming/projection run:
